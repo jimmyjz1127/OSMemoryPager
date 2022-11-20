@@ -6,10 +6,11 @@
 #include <stdbool.h>
 
 // You may find defining the following macros useful. Edit the values below to match your report
-#define PAGETABLE_ROWS	0
+#define PAGETABLE_ROWS	512
 #define PAGETABLE_SIZE	0
-#define FRAME_BITS 	0
-#define OFFSET_BITS 	0
+#define TABLEROW_BITS 16
+#define FRAME_BITS 	 9
+#define OFFSET_BITS 	7
 #define OFFSET_MASK 	0
 
 /**
