@@ -6,13 +6,24 @@
 #include "paging.h"
 
 int main(int argc, char **argv){
-    void* table = pt_init();
+    // void* table = pt_init();
 
-    char text1[]  = "It was the best of times, it was the worst of times";
+    int frame_number = 5;
 
-    printf("%d\n", strlen(text1));
+    bool address[9];
 
-    char text2[] = "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to heaven, we were all going direct the other way–in short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.";
+	//convert frame_number into 16-bit binary 
+	for (int i = 0; i<=8; i++){
+		if (frame_number > 0){
+			address[8-i] = frame_number % 2;
+			frame_number = frame_number/2;
+		}
+        else{
+            address[8-i] = 0;
+        }
+	}
 
-    printf("%d\n", strlen(text2));
+    for (int i = 0; i< 9; i++){
+        printf("%d ", address[i]);
+    }
 }
