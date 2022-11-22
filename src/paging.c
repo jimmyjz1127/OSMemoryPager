@@ -113,7 +113,7 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 	}
 
 	char* b = (char*)buffer;
-	int* frame = (int*)table + (frame_number * 128) + offset; 
+	int* frame = (int*)store + (frame_number * 128) + offset; 
 
 	//write the data to physical frame
 	for (int i =0; i < length; i++){
@@ -150,7 +150,7 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 
 
 	char* b = (char*)buffer;
-	int* frame = (int*)table + (frame_number * 128) + offset; 
+	int* frame = (int*)store + (frame_number * 128) + offset; 
 	//Read data from physical memory into buffer
 	for (int i = 0; i < length; i++){
 		*(b + i) = *(frame + i);
