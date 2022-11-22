@@ -12,6 +12,7 @@
 #define FRAME_BITS 	 9
 #define OFFSET_BITS 	7
 #define OFFSET_MASK 	0
+#define PAGE_SIZE 128
 
 /**
  * Initialise the page table. This should allocate the memory for the page table and return the pointer.
