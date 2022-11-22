@@ -6,6 +6,8 @@
 
 // Your implementation goes in here!
 
+//Free Frame List 
+int freeFrames[256] = {1};
 
 void* pt_init() {
 	//allocate memory for page table (number of page table rows) * (page table entry size)
@@ -121,7 +123,6 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 
 void read_data(void* table, void* store, void* buffer, uint16_t virtual_address, size_t length) {
 	uint16_t physical_address = virtual_to_physical(table, virtual_address);
-
 	bool paddress[16];
 	//convert frame_number into 16-bit binary 
 	for (int i = 0; i<=15; i++){
@@ -147,9 +148,10 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 		}
 	}
 
-	int* b = (int*)buffer;
-	int* frame = (int*)table + (frame_number * 128) + offset; 
 
+	char* b = (char*)buffer;
+	int* frame = (int*)table + (frame_number * 128) + offset; 
+	//Read data from physical memory into buffer
 	for (int i = 0; i < length; i++){
 		*(b + i) = *(frame + i);
 	}
