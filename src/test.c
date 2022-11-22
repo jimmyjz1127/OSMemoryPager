@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int main() {
+int main() {}
 
 	// Allocate 32 KiB of memory to serve as our store
 	void *store = malloc(1<<15);
@@ -68,9 +68,12 @@ int main() {
 	free(buffer);
 	
 	
-	/**
-	 *
+	/**------------------------------- TEST 4 -------------------------------
+	 * Offset Test : 
+	 * Store data of length 94 in frame 30 [000011110] with offset of 10 [0001010]
+	 * Access data from frame 30 with offset of 20 [0010100]
 	 */
+	
 
 
 	

@@ -45,4 +45,6 @@ int main(int argc, char **argv){
     //     printf("%d", *(row+i));
     // }
 
+    printf("%d", getOffset(1232));
+
 }
