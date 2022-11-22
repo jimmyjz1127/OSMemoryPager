@@ -4,8 +4,9 @@
 #include <stdio.h>
 
 int main() {
+	//
 
-	// Allocate 32 KiB of memory to serve as our store
+	// Allocate 32 KiB of memory to serve as our store (physical memory)
 	void *store = malloc(1<<15);
 
 	// Initialise our mapping table
@@ -17,6 +18,7 @@ int main() {
 	map_page_to_frame(table, 2, 0, false, false);
 	map_page_to_frame(table, 3, 2, false, false);
 	map_page_to_frame(table, 4, 15, false, false);
+	map_page_to_frame(table, 4, 30, false, false);
 	print_table(table);
 
 	/**------------------------------- TEST 1 ------------------------------
@@ -50,28 +52,40 @@ int main() {
 	free(buffer);
 	/**------------------------------- TEST 3 -------------------------------
 	 * Offset Test : 
-	 * Store data of length 94 in frame 30 [000011110] with offset of 10 [0001010]
-	 * Access data from frame 30 with offset of 20 [0010100]
+	 * Store data of length 94 in frame 15 [000011110] with offset of 10 [0001010]
+	 * Access data from frame 15 with offset of 20 [0010100]
 	 */
-	 printf("\n");
-	 printf("--------------------------- TEST 3 ---------------------------\n");
+	printf("\n");
+	printf("--------------------------- TEST 3 ---------------------------\n");
 	char text3[] = "There is starter code on studres for simulating paging on the 16-bit architecture from Part 1.";
 	length = strlen(text3);
 	buffer = malloc(length+1-10);
 
 	// Virtual address [0000001000001010] = 522. Page number 4 [000000100] and offset 10 [0001010]
 	store_data(table, store, text3, 522, length);
-	// Virtual address [0000001000010100] = 512. Page number 4 [000000100] and offset 20 [0010100]
+	// Virtual address [0000001000010100] = 532. Page number 4 [000000100] and offset 20 [0010100]
 	read_data(table, store, buffer, 532, length);
 	printf("%s\n", buffer);
  
 	free(buffer);
-	
-	
-	/**
-	 *
-	 */
 
+	
+	/**------------------------------- TEST 4 -------------------------------
+	 * Rewriting over previously written data : 
+	 * Overwrite data stored in TEST 3 with a new set of data
+	 */
+	printf("\n");
+	printf("--------------------------- TEST 4 ---------------------------\n");
+	char text4[] = "Make sure you describe your implementation in the report and justify main design decisions";
+	length = strlen(text4);
+	buffer = malloc(length + 1);
+
+	// Virtual address [0000001000000000] = 522. Page number 4 [000000100] and offset 0 [0000000]. Stores data in frame 15 in physical memory
+	store_data(table, store, text4, 512, length);
+	read_data(table, store, buffer, 512, length);
+	printf("%s\n", buffer);
+ 
+	free(buffer);
 
 	
 	// Cleanup
