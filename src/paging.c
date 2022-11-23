@@ -165,6 +165,7 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 
 	//iterate all pages 
 	while (j < num_pages){
+		//write to frame until we reach max frame size of 128 bytes
 		while (k < 128 && i < length){
 			frame[(frame_number * 128) + k] = b[i];
 			k++;
@@ -173,6 +174,8 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 		k = 0;
 		j+=1;
 		if (j == num_pages) break;
+
+		//find next free physical frame to write to
 		frame_number = page_to_frame_num(table, page_number + j);
 		frame = (char*)store + (128 * frame_number);
 		
@@ -204,6 +207,7 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 		k = 0;
 		j++;
 		if (j == num_pages) break;
+		//find next physical frame to read from
 		frame_number = page_to_frame_num(table, page_number + j);
 		frame = (char*)store + (128 * frame_number);
 	}

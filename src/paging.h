@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <math.h>
 
 // You may find defining the following macros useful. Edit the values below to match your report
 #define PAGETABLE_ROWS	512
