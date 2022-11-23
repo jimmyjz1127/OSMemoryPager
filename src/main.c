@@ -44,7 +44,4 @@ int main(int argc, char **argv){
     // for (int i = 10; i<20; i++){
     //     printf("%d", *(row+i));
     // }
-
-    printf("%d", getOffset(1232));
-
 }

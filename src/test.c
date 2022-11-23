@@ -3,8 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int main() {}
-
+int main() {
 	// Allocate 32 KiB of memory to serve as our store
 	void *store = malloc(1<<15);
 
@@ -12,12 +11,14 @@ int main() {}
 	void *table = pt_init();
 
 	// Add some basic mappings to the table
-	map_page_to_frame(table, 0, 4, false, false);
-	map_page_to_frame(table, 1, 3, false, false);
-	map_page_to_frame(table, 2, 0, false, false);
-	map_page_to_frame(table, 3, 2, false, false);
-	map_page_to_frame(table, 4, 15, false, false);
+	// map_page_to_frame(table, 0, 4, false, false);
+	// map_page_to_frame(table, 1, 3, false, false);
+	// map_page_to_frame(table, 2, 0, false, false);
+	// map_page_to_frame(table, 3, 2, false, false);
+	// map_page_to_frame(table, 4, 15, false, false);
 	print_table(table);
+
+	
 
 	/**------------------------------- TEST 1 ------------------------------
 	 * Now try to write something to our store. Our implementation should transparently use the
@@ -28,12 +29,12 @@ int main() {}
 	char text[]  = "It was the best of times, it was the worst of times";
 	size_t length = strlen(text);
 	char *buffer = malloc(length+1);
-
 	store_data(table, store, text, 0, length);
 	read_data(table, store, buffer, 0, length);
 	printf("%s\n", buffer);
 
 	free(buffer);
+
 	/**------------------------------- TEST 2 -------------------------------
 	 * Now try something longer and see what happens. The data read out should be exactly the same as what was put in
 	 */
@@ -73,10 +74,20 @@ int main() {}
 	 * Store data of length 94 in frame 30 [000011110] with offset of 10 [0001010]
 	 * Access data from frame 30 with offset of 20 [0010100]
 	 */
-	
+	printf("\n");
+	printf("--------------------------- TEST 4 ---------------------------\n");
+	// char text4[] = "You can use the references provided in this spec as a starting point, but you are encouraged to research beyond this and clearly identify all the sources you used.";
+	char text4[] = "HELLO WORLD";
+	length = strlen(text4);
+	buffer = malloc(length+1);
+
+	store_data(table, store, text4, 2432, length);
+	read_data(table, store, buffer, 2432, length);
+	printf("%s\n", buffer);
+ 
+	// free(buffer);
 
 
-	
 	// Cleanup
 	free(store);
 	free(table);
