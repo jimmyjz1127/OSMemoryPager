@@ -9,7 +9,7 @@
 void *disk;
 
 //Free Frame List 
-int freeFrames[512] = {1};
+int freeFrames[256] = {1};
 
 /**
  * Retrieves the frame number of a free frame in physical memory 
@@ -17,12 +17,13 @@ int freeFrames[512] = {1};
 */
 int getFreeFrame(){
 	//search for free frame
-	for (int i = 0; i < 512; i++){
+	for (int i = 0; i < 256; i++){
 		if (freeFrames[i] != -1){
 			freeFrames[i] = -1;
 			return i;
 		}
 	}
+
 	return -1;
 }
 
@@ -33,6 +34,7 @@ void* pt_init() {
 	return table;
 }
 
+//not using this function for my implementation
 uint16_t virtual_to_physical(void* table, uint16_t virtual_address) {
 	return -1;
 }
@@ -48,6 +50,7 @@ uint16_t page_to_frame_num(void* table, uint16_t page_number){
 
 	uint16_t frame_number = 0;
 
+	//if the page has not been mapped to a physical frame
 	if (*(row+15) != 1){
 		frame_number = getFreeFrame();
 
@@ -67,16 +70,17 @@ uint16_t page_to_frame_num(void* table, uint16_t page_number){
 }
 
 /**
- * Given a page number, finds the corresponding frame in table. 
- * If page is marked as invalid in table, the function will look through disk for the requested frame 
- * If the frame is found in disk, it will be first written to memory, then the corresponding 
- * memory frame number will be returned.
- * 
+ * Given a page number, simply returns corresponding frame number in table.
 */
-uint16_t readFrame(void* table, uint16_t page_number){
+uint16_t get_frame_from_page(void* table, uint16_t page_number){
 	int* row = (int*)table + (page_number * 16);
+	uint16_t frame_number = 0;
 
+	for (int i = 0; i<9; i++){
+		frame_number += (*(row + i)) * pow(2, 8-i); 
+	}
 
+	return frame_number;
 }
 
 /**
@@ -114,6 +118,8 @@ uint16_t getOffset(uint16_t address){
 void map_page_to_frame(void* table, uint16_t page_number, uint16_t frame_number, bool readonly, bool executable) {
 	//the row in page table correspomding to given page_number
 	int *row = (int*)table + (16*page_number);
+
+	freeFrames[frame_number] = -1;
 	
 	//convert frame_number into 9-bit binary and add bits to row in page table 
 	for (int i = 0; i<=8; i++){
@@ -129,7 +135,7 @@ void map_page_to_frame(void* table, uint16_t page_number, uint16_t frame_number,
 	//add protection bits to page table row 
 	*(row+13) = readonly;
 	*(row+14) = executable;
-	*(row+15) = 1;//set the valid bit 
+	*(row+15) = 1;//set the allocated bit - determines whether the page is currently in use 
 }
 
 void print_table(void* table) {
@@ -178,13 +184,12 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 		//find next free physical frame to write to
 		frame_number = page_to_frame_num(table, page_number + j);
 		frame = (char*)store + (128 * frame_number);
-		
 	}
 }
 
 void read_data(void* table, void* store, void* buffer, uint16_t virtual_address, size_t length) {
 	uint16_t page_number = getPageNumber(virtual_address);
-	uint16_t frame_number = page_to_frame_num(table, page_number);
+	uint16_t frame_number = get_frame_from_page(table, page_number);
 	uint16_t offset = getOffset(virtual_address);
 
 	int num_pages = ceil((length + offset)/128.0);
@@ -208,7 +213,7 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 		j++;
 		if (j == num_pages) break;
 		//find next physical frame to read from
-		frame_number = page_to_frame_num(table, page_number + j);
+		frame_number = get_frame_from_page(table, page_number + j);
 		frame = (char*)store + (128 * frame_number);
 	}
 }
