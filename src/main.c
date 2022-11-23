@@ -17,31 +17,24 @@ int main(int argc, char **argv){
 
 
     //-------------------------------------------
-    //store_data(table, table, table, 4369, 10);
+    char *buffer = malloc(20);
 
-    // printf("%d\n", 1<<15);
-    // char x[] = "HELLOWORLD";
-    // void *arr = malloc(100);
-    // void *list = malloc(100);
-    // list = x;
+    for (int i =0; i<20; i++){
+        strcpy(buffer + i,"a");
+    }
 
-    // int* row = (int*)arr;
-    // int* b = (int*)list;
+    printf("%s", buffer);
 
-    // for (int i = 0; i<10; i++){
-    //     *(row+i) = *(b+i);
-    // }
-    // printf("%s\n", row);
+    // char text[] = "HELLOWORLD";
 
-    // for (int i = 10; i<20; i++){
-    //     *(row+i) = 1;
-    // }
+    // void* buffer = text;
 
-    // for (int i = 0; i < 10; i++){
-    //     printf("%c", *(row+i));
-    // }
+    // char *s = buffer;
 
-    // for (int i = 10; i<20; i++){
-    //     printf("%d", *(row+i));
-    // }
+    // char x = s[0];
+    // char y = s[1];
+
+
+    // printf("%c", y);
+    // printf("%c", x);
 }

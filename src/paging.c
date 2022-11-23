@@ -10,25 +10,20 @@ void *disk;
 
 //Free Frame List 
 int freeFrames[512] = {1};
-int freeFrameIndex = 0;
 
 /**
  * Retrieves the frame number of a free frame in physical memory 
  * @return : the frame number of a free memory frame or -1 if there are none
 */
 int getFreeFrame(){
-	//if we have used all free frames - no free frames left
-	if (freeFrameIndex >= 512){
-		//choose of a random frame to swap
-		int f = rand() % 512;
-		return -1;
+	//search for free frame
+	for (int i = 0; i < 512; i++){
+		if (freeFrames[i] != -1){
+			freeFrames[i] = -1;
+			return i;
+		}
 	}
-	else{
-		freeFrames[freeFrameIndex] = -1;
-		printf("FREEFRAMEINDEX : [%d]\n", freeFrameIndex);
-		freeFrameIndex += 1;//increase index
-		return freeFrameIndex-1;
-	}
+	return -1;
 }
 
 void* pt_init() {
@@ -44,6 +39,7 @@ uint16_t virtual_to_physical(void* table, uint16_t virtual_address) {
 
 /**
  * Given a page number, returns corresponding frame number from page table
+ * If page i marked as invalid, it will find a free frame and map page number to the newly found frame in memory
  * @param (table) : page table
  * @param (page_number) : uint16_t representing page_number in page table
 */
@@ -68,6 +64,19 @@ uint16_t page_to_frame_num(void* table, uint16_t page_number){
 	}
 
 	return frame_number;
+}
+
+/**
+ * Given a page number, finds the corresponding frame in table. 
+ * If page is marked as invalid in table, the function will look through disk for the requested frame 
+ * If the frame is found in disk, it will be first written to memory, then the corresponding 
+ * memory frame number will be returned.
+ * 
+*/
+uint16_t readFrame(void* table, uint16_t page_number){
+	int* row = (int*)table + (page_number * 16);
+
+
 }
 
 /**
@@ -121,11 +130,6 @@ void map_page_to_frame(void* table, uint16_t page_number, uint16_t frame_number,
 	*(row+13) = readonly;
 	*(row+14) = executable;
 	*(row+15) = 1;//set the valid bit 
-
-	// printf("\n");
-	// for (int i = 0; i < 16; i++){
-	// 	printf("[%d] ", *(row+i));
-	// }printf("\n");
 }
 
 void print_table(void* table) {
@@ -139,10 +143,7 @@ void unmap_page(void* table, uint16_t page_number) {
 }
 
 void store_data(void* table, void* store, void* buffer, uint16_t virtual_address, size_t length) {
-	printf("==========STORE DATA==========\n");
-	printf("SD FRAME INDEX : {%d}\n", freeFrameIndex);
 	uint16_t page_number = getPageNumber(virtual_address);
-	printf("SD PAGE NUMBER : [%d]\n", page_number);	
 	uint16_t frame_number = page_to_frame_num(table, page_number);
 	uint16_t offset = getOffset(virtual_address);
 	int num_pages = ceil((length + offset)/128.0);
@@ -155,8 +156,8 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 		}
 	}
 
-	char* b = (char*)buffer;
-	int* frame = (int*)store + (frame_number * 128); 
+	char *b = buffer;
+	char *frame = store; 
 
 	int j = 0;//page index
 	int i = 0;//index from buffer
@@ -164,8 +165,8 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 
 	//iterate all pages 
 	while (j < num_pages){
-		while (k < 128){
-			*(frame + k) = *(b + i);
+		while (k < 128 && i < length){
+			frame[(frame_number * 128) + k] = b[i];
 			k++;
 			i++;
 		}
@@ -173,20 +174,20 @@ void store_data(void* table, void* store, void* buffer, uint16_t virtual_address
 		j+=1;
 		if (j == num_pages) break;
 		frame_number = page_to_frame_num(table, page_number + j);
-		frame = (int*)store + (128 * frame_number);
+		frame = (char*)store + (128 * frame_number);
+		
 	}
 }
 
 void read_data(void* table, void* store, void* buffer, uint16_t virtual_address, size_t length) {
-	printf("==========READ DATA===========\n");
 	uint16_t page_number = getPageNumber(virtual_address);
 	uint16_t frame_number = page_to_frame_num(table, page_number);
 	uint16_t offset = getOffset(virtual_address);
 
 	int num_pages = ceil((length + offset)/128.0);
 	
-	char* b = (char*)buffer;
-	int* frame = (int*)store + (frame_number * 128); 
+	char *b = buffer;
+	char *frame = store;
 
 	int j = 0;//page index
 	int i = 0;//index from buffer
@@ -194,8 +195,9 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 
 	//iterate all pages
 	while (j < num_pages){
-		while (k < 128){
-			*(b+i) = *(frame + k);
+		while (k < 128 && i < length){
+			// printf("%c", frame[(frame_number * 128) + k]);
+			b[i] = frame[(frame_number * 128) + k];
 			k++;
 			i++;
 		}
@@ -203,7 +205,7 @@ void read_data(void* table, void* store, void* buffer, uint16_t virtual_address,
 		j++;
 		if (j == num_pages) break;
 		frame_number = page_to_frame_num(table, page_number + j);
-		frame = (int*)store + (128 * frame_number);
+		frame = (char*)store + (128 * frame_number);
 	}
 }
 

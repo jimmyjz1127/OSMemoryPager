@@ -51,8 +51,8 @@ int main() {
 	free(buffer);
 	/**------------------------------- TEST 3 -------------------------------
 	 * Offset Test : 
-	 * Store data of length 94 in frame 30 [000011110] with offset of 10 [0001010]
-	 * Access data from frame 30 with offset of 20 [0010100]
+	 * Store data of length 94 in with offset 10
+	 * Read data from offset 20
 	 */
 	 printf("\n");
 	 printf("--------------------------- TEST 3 ---------------------------\n");
@@ -60,24 +60,20 @@ int main() {
 	length = strlen(text3);
 	buffer = malloc(length+1-10);
 
-	// Virtual address [0000001000001010] = 522. Page number 4 [000000100] and offset 10 [0001010]
-	store_data(table, store, text3, 522, length);
-	// Virtual address [0000001000010100] = 512. Page number 4 [000000100] and offset 20 [0010100]
-	read_data(table, store, buffer, 532, length);
+	// Virtual address [0000001110001010] = 906. Page number 7 [000000111] and offset 10 [0001010]
+	store_data(table, store, text3, 906, length);
+	// Virtual address [0000001110010100] = 1022. Page number 7 [000000111] and offset 20 [0010100]
+	read_data(table, store, buffer, 916, length - 10);
 	printf("%s\n", buffer);
  
 	free(buffer);
 	
-	
 	/**------------------------------- TEST 4 -------------------------------
-	 * Offset Test : 
-	 * Store data of length 94 in frame 30 [000011110] with offset of 10 [0001010]
-	 * Access data from frame 30 with offset of 20 [0010100]
+	 * Large Data Test 
 	 */
 	printf("\n");
 	printf("--------------------------- TEST 4 ---------------------------\n");
-	// char text4[] = "You can use the references provided in this spec as a starting point, but you are encouraged to research beyond this and clearly identify all the sources you used.";
-	char text4[] = "HELLO WORLD";
+	char text4[] = "Make sure you describe your implementation in the report and justify main design decisions. There is very little actual code needed, but you will need to think carefully about how to implement the page table from Part 1, and how to use pointers appropriately to make sure your implementation is correct. You should provide evidence of testing that demonstrates that your solution works for a range of non-trivial tasks.";
 	length = strlen(text4);
 	buffer = malloc(length+1);
 
@@ -85,10 +81,10 @@ int main() {
 	read_data(table, store, buffer, 2432, length);
 	printf("%s\n", buffer);
  
-	// free(buffer);
-
-
+	free(buffer);
+	
 	// Cleanup
 	free(store);
 	free(table);
+	
 }
